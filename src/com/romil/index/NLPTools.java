@@ -48,7 +48,7 @@ public class NLPTools {
 	public  Map<String,Integer> generateMap(String sen){
 		Map<String,Integer> map= new HashMap<String, Integer>();
 		
-		for (String sentence : newTokenizer(sen)) {
+		for (String sentence : JavaTokenizer(sen)) {
 			if(map.containsKey(sentence))
 				map.put(sentence, map.get(sentence)+1);
 			else if(!sentence.contains("http:") )
