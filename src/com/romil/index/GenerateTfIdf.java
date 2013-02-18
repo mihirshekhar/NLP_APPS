@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,22 +38,16 @@ public class GenerateTfIdf {
 		long t0=System.currentTimeMillis();
 		new File("maleindex").mkdir();
 		new File("femaleindex").mkdir();
-		//final RandomAccessFile fileWritter=new RandomAccessFile("search_titleindex/index.txt", "rw");
-		//FileWriter fileWritter = new FileWriter("maleindex/index.txt");
-		//FileWriter fileWritter2 = new FileWriter("femaleindex/index.txt");
 
-		//final BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
-		//final BufferedWriter bufferWritter2 = new BufferedWriter(fileWritter2);
-
-		TreeMap<String,String> male= new TreeMap<String,String>();
-		TreeMap<String,String> female= new TreeMap<String,String>();
+		
+		TreeMap<String,ArrayList<Integer>> index= new TreeMap<String,ArrayList<Integer>>();
 		
 		File folder = new File("ens/");
-		File file=folder.listFiles()[0];
+		File files[]=folder.listFiles();
 		int i,j;
-		for(i = 0,j=0; folder.listFiles().length>0;){
+		for(i = 0,j=folder.listFiles().length; j>0; j--){
 			try {
-				file= folder.listFiles()[0];
+				File file= files[j-1];
 				String name[]=file.getName().split("[_.]");
 				System.out.println(name[name.length-2]);
 				System.out.println(name[0]);
@@ -65,87 +60,79 @@ public class GenerateTfIdf {
 	        	NodeList nList = odoc.getElementsByTagName("conversation");
 	        	Element e = (Element)nList.item(0);
 	        	System.out.println(e.getAttribute("id"));
+	        	String conversation = e.getTextContent().trim();
 	        	System.out.println(e.getTextContent().trim());
 				if(name[name.length-2].equalsIgnoreCase("male")){
 					i++;
 					Map<String, Integer> temp = tool.generateMap(e.getTextContent().trim());
 					for(String s:temp.keySet()){
-						if(male.containsKey(s)){
-							male.put(s, male.get(s).concat("$#"+name[0]+","+temp.get(s)));
+						if(index.containsKey(s)){
+							ArrayList<Integer> t= index.get(s);
+							Integer ss = t.get(0) + temp.get(s);
+							t.remove(0);
+							t.add(0, ss);
+							index.put(s, t);
 						}
 						else{
-							male.put(s, name[0]+","+temp.get(s));
+							ArrayList<Integer> t = new ArrayList<Integer>();
+							t.add(temp.get(s));
+							t.add(0);
+							index.put(s,t);
 						}
 					}
 				}
 				else{
-					j++;
+					i++;
 					Map<String, Integer> temp = tool.generateMap(e.getTextContent().trim());
 					for(String s:temp.keySet()){
-						if(female.containsKey(s)){
-							female.put(s, female.get(s).concat("$#"+name[0]+","+temp.get(s)));
+						if(index.containsKey(s)){
+							ArrayList<Integer> t= index.get(s);
+							Integer ss = t.get(0) + temp.get(s);
+							t.remove(1);
+							t.add(1, ss);
+							index.put(s, t);
 						}
 						else{
-							female.put(s, name[0]+","+temp.get(s));
+							ArrayList<Integer> t = new ArrayList<Integer>();
+							t.add(0);
+							t.add(temp.get(s));
+							index.put(s,t);
 						}
 					}
 				}
 				if(i%10000==0){
-					Integer index=i/10000;
-					FileWriter fileWritter = new FileWriter("./maleindex/index"+index.toString()+".txt",true);
-					for(String s : male.keySet()){
-						String q= s+"$#"+male.get(s)+"\n";
+					Integer in=i/10000;
+					FileWriter fileWritter = new FileWriter("./maleindex/index"+in.toString()+".txt",true);
+					for(String s : index.keySet()){
+						String q= s+"|"+index.get(s).get(0)+"@"+index.get(s).get(1)+"\n";
 						fileWritter.append(q);
 					}
 					fileWritter.flush();
 					fileWritter.close();
-					male.clear();
-				}
-				if(j%10000==0){
-					Integer index=j/10000;
-					FileWriter fileWritter = new FileWriter("./femaleindex/index"+index.toString()+".txt",true);
-					for(String s : female.keySet()){
-						String q= s+"$#"+female.get(s)+"\n";
-						fileWritter.append(q);
-			
-					}
-					fileWritter.flush();
-					fileWritter.close();
-					female.clear();
+					index.clear();
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			finally{
-				file.renameTo(new File("done/"+file.getName()));
+				//file.renameTo(new File("done/"+file.getName()));
 				//break;
 			}
 		}
 		if(i%10000!=0){
-			Integer index=i/10000;
-			index++;
-			FileWriter fileWritter = new FileWriter("./maleindex/index"+index.toString()+".txt",true);
-			for(String s : male.keySet()){
-				String q= s+"$#"+male.get(s)+"\n";
+			Integer in=i/10000;
+			in++;
+			FileWriter fileWritter = new FileWriter("./maleindex/index"+in.toString()+".txt",true);
+			for(String s : index.keySet()){
+				String q= s+"|"+index.get(s).get(0)+"@"+index.get(s).get(1)+"\n";
 				fileWritter.append(q);
 			}
 			fileWritter.flush();
 			fileWritter.close();
-			male.clear();
+			index.clear();
 		}
-		if(j%10000!=0){
-			Integer index=j/10000;
-			index++;
-			FileWriter fileWritter = new FileWriter("./femaleindex/index"+index.toString()+".txt",true);
-			for(String s : female.keySet()){
-				String q= s+"$#"+female.get(s)+"\n";
-				fileWritter.append(q);
-			}
-			fileWritter.flush();
-			fileWritter.close();
-			female.clear();
-		}
+		
 		long t1=System.currentTimeMillis();
 		//bufferWritter.close();
 		//fileWritter.close();
