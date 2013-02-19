@@ -49,7 +49,8 @@ public class GenerateTfIdf {
 		for(i = 0,j=folder.listFiles().length; j>0; j--){
 			System.err.println(j);
 			try {
-				File file=  new File("/home/romil/Documents/pan_author_profiling_training_data/en/fff2a45894aaf04e05e3c3b6509b9f1_en_20s_male.xml");
+				//File file=  new File("/home/romil/Documents/pan_author_profiling_training_data/en/fff2a45894aaf04e05e3c3b6509b9f1_en_20s_male.xml");
+				File file= files[j-1];
 				String name[]=file.getName().split("[_.]");
 				//System.out.println(name[name.length-2]);
 				//System.out.println(name[0]);
@@ -68,6 +69,8 @@ public class GenerateTfIdf {
 					if(name[name.length-2].equalsIgnoreCase("male")){
 						i++;
 						Map<String, Integer> temp = tool.generateMap(e.getTextContent().trim());
+						//System.out.println(temp);
+						
 						for(String s:temp.keySet()){
 							if(index.containsKey(s)){
 								ArrayList<Integer> t= index.get(s);
@@ -158,7 +161,7 @@ public class GenerateTfIdf {
 			}
 			finally{
 				//file.renameTo(new File("done/"+file.getName()));
-				break;
+				//break;
 			}
 		}
 		if(i%10000!=0){

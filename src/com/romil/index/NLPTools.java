@@ -6,12 +6,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.xml.sax.HandlerBase;
-
+import java.util.TreeMap;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
@@ -46,7 +43,7 @@ public class NLPTools {
 	}
 	
 	public  Map<String,Integer> generateMap(String sen){
-		Map<String,Integer> map= new HashMap<String, Integer>();
+		Map<String,Integer> map= new TreeMap<String, Integer>();
 		
 		for (String sentence : JavaTokenizer(sen)) {
 			if(map.containsKey(sentence))
@@ -126,7 +123,7 @@ public class NLPTools {
 			se.stem();
 			i=se.toString().toLowerCase();
 			
-			if(i.trim().length()>2&&!checkStopWord(i))
+			if(!checkStopWord(i))
 				tokens.add(i);
 		}
 		return tokens;
