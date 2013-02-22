@@ -70,7 +70,6 @@ public class GenerateTfIdf {
 						i++;
 						Map<String, Integer> temp = tool.generateMap(e.getTextContent().trim());
 						//System.out.println(temp);
-						
 						for(String s:temp.keySet()){
 							if(index.containsKey(s)){
 								ArrayList<Integer> t= index.get(s);
